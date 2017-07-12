@@ -8,7 +8,7 @@
 using namespace std;
 using namespace System;
 
-bool choose(string);
+char choose(string);
 double getValue(string);
 
 int main()
@@ -22,21 +22,33 @@ int main()
 
 		Asset a = Asset(cost, salvage, life);
 		
-		cout << "\nThe annual depreciation allowance on a $" << a.getOrigCost() << " asset\nwith a salvage value of $" << a.getOrigSalvage() << "\nand a life of " << a.getOriginalLife() << " years = $" << a.getAnnualDepreciation() << "\nper year under straight-line." << endl << endl;
-		if (choose("Would you like to see a complete schedule? ")) {
+		cout << "\nThe annual depreciation allowance on a $" << a.getOrigCost() << " asset\nwith a salvage value of $" << a.getOrigSalvage() << "\nand a life of " << a.getOriginalLife() << " years = $" << a.getAnnualDepreciation() << "\nper year under straight-line or $" << a.getAnnualDepreciation(1) << " first year depreciation under double-declining." << endl << endl;
+		char type = choose("Would you like to see a complete schedule for Straight-Line, DDL, or Neither? (s/d/n)");
+		if (type == 's' || type == 'S') {
 			cout << "Year | Start Value | Depreciation | End Value" << endl;
 			for (int i = 1; i < a.getOriginalLife() + 1; i++) {
-				cout << i << "\t" << a.getBegBal(i) << "\t\t" << a.getAnnualDepreciation() << "\t\t" << a.getEndVal(i) << endl;
+				cout << i << "\t" << a.getBegBal(i) << "\t\t" << a.getAnnualDepreciation() << "\t\t" << a.getEndBal(i) << endl;
 			}
 		}
-	} while (choose("Would you like to calculate another depreciation? "));
+		else if (type == 'd' || type == 'D') {
+			cout << "Year | Start Value | Depreciation | End Value" << endl;
+			for (int i = 1; i < a.getOriginalLife() + 1; i++) {
+				if (a.getAnnualDepreciation(i) == 0) {
+					cout << i << "\t" << "--no depreciation allowed--" << endl;
+				}
+				else {
+					cout << i << "\t" << a.getDouDecBegBal(i) << "\t\t" << a.getAnnualDepreciation(i) << "\t\t" << a.getDouDecEndBal(i) << endl;
+				}
+			}
+		}
+	} while (choose("Would you like to calculate another depreciation? ") == 'y');
 
 	cout << "Thanks for using the depreciation calculator" << endl << endl;
 	system("Pause");
     return 0;
 }
 
-bool choose(string message) {
+char choose(string message) {
 	char choice;
 	cin.ignore(1000, '\n');
 	cout << message;
@@ -45,13 +57,10 @@ bool choose(string message) {
 	if (!cin.good()) {
 		cin.clear();
 		cin.ignore(1000, '\n');
-		return false;
-	}
-	else if (choice == 'y' || choice == 'Y') {
-		return true;
+		choice = 'n';
 	}
 
-	return false;
+	return choice;
 }
 
 double getValue(string message) {
